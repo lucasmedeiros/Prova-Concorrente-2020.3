@@ -5,9 +5,12 @@ import java.util.concurrent.Semaphore;
 public class Buffer {
     private int alunosBebendo = 0;
     private int alunosRemediados = 0;
-    private final Semaphore semaforoAlunos = new Semaphore(1);
-    private final Semaphore semaforoRemediados = new Semaphore(0);
+    private final Semaphore semaforoAlunos = new Semaphore(1); // Semáforo para proteger as threads de alunos que acessam o bar.
+    private final Semaphore semaforoRemediados = new Semaphore(0); // Semáforo para alunos remediados esperarem outro aluno sentar para sairem.
 
+    /**
+     * Método chamado pelos alunos para pegar uma bebida no bar.
+     */
     public void pegarBebida() {
         try {
             this.semaforoAlunos.acquire();
@@ -23,6 +26,13 @@ public class Buffer {
         this.semaforoAlunos.release();
     }
 
+    /**
+     * Método chamado pelos alunos para beber a bebida escolhida. Se um estudante estiver remediado,
+     * mas outro estudante estiver sendo deixado sozinho no bar, ele espera no semáforo de alunos
+     * remediados.
+     *
+     * @param id id do aluno.
+     */
     public void beber(int id) {
         System.out.println(id + " bebeu");
 
@@ -48,6 +58,11 @@ public class Buffer {
         }
     }
 
+    /**
+     * Método chamado pelo aluno para sair do bar.
+     *
+     * @param id id do aluno.
+     */
     public void sair(int id) {
         System.out.println(id + " saiu");
     }
