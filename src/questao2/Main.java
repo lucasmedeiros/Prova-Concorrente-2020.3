@@ -20,4 +20,26 @@ package questao2;
  */
 
 public class Main {
+    private static int QUANTIDADE_ALUNOS = 8;
+
+    public static void main(String[] args) {
+        Buffer buffer = new Buffer();
+        Thread[] alunosUFCG = new Thread[QUANTIDADE_ALUNOS];
+        Thread[] alunosUEPB = new Thread[QUANTIDADE_ALUNOS];
+
+        for (int i = 0; i < QUANTIDADE_ALUNOS; i++) {
+            Aluno aluno = new Aluno(i, "UFCG", buffer);
+            alunosUFCG[i] = new Thread(aluno);
+        }
+
+        for (int i = 0; i < QUANTIDADE_ALUNOS; i++) {
+            Aluno aluno = new Aluno(i, "UEPB", buffer);
+            alunosUEPB[i] = new Thread(aluno);
+        }
+
+        for (int i = 0; i < QUANTIDADE_ALUNOS; i++) {
+            alunosUFCG[i].start();
+            alunosUEPB[i].start();
+        }
+    }
 }

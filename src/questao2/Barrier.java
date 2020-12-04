@@ -1,22 +1,22 @@
 package questao2;
 
 public class Barrier {
-    private final int n;
+    private final int total;
+    private int threadsAwaiting;
 
-    public Barrier(int n) {
-        this.n = n;
+    public Barrier(int total) {
+        this.total = total;
+        this.threadsAwaiting = total;
     }
 
+    public synchronized void await() throws InterruptedException {
+        this.threadsAwaiting--;
 
-    public synchronized void block() throws InterruptedException {
-        wait();
-    }
-
-    public synchronized void release() {
-        notify();
-    }
-
-    public synchronized void releaseAll() {
-        notifyAll();
+        if (this.threadsAwaiting > 0) {
+            this.wait();
+        } else {
+            this.threadsAwaiting = this.total;
+            notifyAll();
+        }
     }
 }
