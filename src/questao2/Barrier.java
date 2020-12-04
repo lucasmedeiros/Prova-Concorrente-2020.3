@@ -1,5 +1,8 @@
 package questao2;
 
+/**
+ * Implementação simples de uma barreira para auxiliar na questão 02.
+ */
 public class Barrier {
     private final int total;
     private int threadsAwaiting;

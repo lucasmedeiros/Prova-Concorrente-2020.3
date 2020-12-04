@@ -39,6 +39,9 @@ public class Main {
 
         for (int i = 0; i < QUANTIDADE_ALUNOS; i++) {
             alunosUFCG[i].start();
+        }
+
+        for (int i = 0; i < QUANTIDADE_ALUNOS; i++) {
             alunosUEPB[i].start();
         }
     }

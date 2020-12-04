@@ -1,21 +1,28 @@
 package questao2;
 
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.Semaphore;
 
 public class Buffer {
-    private int qtdAlunosUFCG = 0;
-    private int qtdAlunosUEPB = 0;
-    private boolean isRemador = false;
     private final int CAPACIDADE = 4;
     private final int ALUNOS_MESMA_ESCOLA = 2;
 
-    private final Barrier barrier = new Barrier(this.CAPACIDADE);
-    private final Semaphore semaforoAlunos = new Semaphore(1);
-    private final Semaphore filaAlunosUFCG = new Semaphore(0);
-    private final Semaphore filaAlunosUEPB = new Semaphore(0);
+    private int qtdAlunosUFCG = 0;
+    private int qtdAlunosUEPB = 0;
+    private boolean isRemador = false; // Indicador de qual thread deve chamar o método rema.
 
+    private final Barrier barrier = new Barrier(this.CAPACIDADE);
+    private final Semaphore semaforoAlunos = new Semaphore(1); // Semáforo para proteger a contagem de alunos da UFCG e da UEPB.
+    private final Semaphore filaAlunosUFCG = new Semaphore(0); // Semáforo para controlar o número de alunos da UFCG que embarcam.
+    private final Semaphore filaAlunosUEPB = new Semaphore(0); // Semáforo para controlar o número de alunos da UEPB que embarcam.
+
+    /**
+     * Método chamado por um aluno da UFCG para embarcar no barco.
+     */
     private void embarcaUFCG() {
+        try {
+            this.semaforoAlunos.acquire();
+        } catch (InterruptedException e) {}
+
         this.qtdAlunosUFCG++;
         if (this.qtdAlunosUFCG == this.CAPACIDADE) {
             this.filaAlunosUFCG.release(this.CAPACIDADE);
@@ -36,7 +43,14 @@ public class Buffer {
         } catch (InterruptedException e) { }
     }
 
+    /**
+     * Método chamado por um aluno da UEPB para embarcar no barco.
+     */
     private void embarcaUEPB() {
+        try {
+            this.semaforoAlunos.acquire();
+        } catch (InterruptedException e) {}
+
         this.qtdAlunosUEPB++;
         if (this.qtdAlunosUEPB == this.CAPACIDADE) {
             this.filaAlunosUEPB.release(this.CAPACIDADE);
@@ -57,13 +71,13 @@ public class Buffer {
         } catch (InterruptedException e) {}
     }
 
+    /**
+     * Método chamado pelos alunos para embarcar no barco.
+     *
+     * @param id id do aluno.
+     * @param escola escola a qual o aluno pertence.
+     */
     public void embarcar(int id, String escola) {
-        this.isRemador = false;
-
-        try {
-            this.semaforoAlunos.acquire();
-        } catch (InterruptedException e) {}
-
         if (escola == "UFCG") {
             this.embarcaUFCG();
         } else {
@@ -81,6 +95,12 @@ public class Buffer {
         }
     }
 
+    /**
+     * Método chamado por um aluno que embarcou, para que reme o barco.
+     *
+     * @param id id do aluno.
+     * @param escola escola a qual o aluno pertence.
+     */
     public void rema(int id, String escola) {
         System.out.println(id + " (" + escola + ") remou.");
         this.semaforoAlunos.release();
