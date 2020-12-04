@@ -16,7 +16,7 @@ package questao1;
  */
 
 public class Main {
-    public static int TOTAL_PASSAGEIROS = 8;
+    private static int TOTAL_PASSAGEIROS = 8;
 
     public static void main(String[] args) {
         Buffer buffer = new Buffer(4);

@@ -8,7 +8,7 @@ public class Carro implements Runnable {
     }
 
     public void run() {
-        while(true) {
+        for(int i = 1; i <= 2; i++) {
             this.buffer.carregar();
             this.buffer.correr();
             this.buffer.descarregar();
