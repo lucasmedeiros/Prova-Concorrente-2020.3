@@ -2,14 +2,6 @@ package questao1;
 
 import java.util.concurrent.Semaphore;
 
-/**
- * 1 - 5.8 The roller coaster problem
- * 2 - 5.7 River crossing problem
- * 3 - 7.6 Dining Hall problem
- *
- * the little book of semaphores
- */
-
 public class Buffer {
     private final int capacidade;
     private int passageirosEmbarcando = 0;
