@@ -10,6 +10,9 @@ package questao1;
 
 public class Buffer {
     private int vagasDisponiveis = Main.TOTAL_ASSENTOS;
+    private boolean correndo = false;
+    private boolean carregado = false;
+    private boolean descarregado = false;
 
     private final Object travaPassageiros = new Object();
     private final Object travaCarro = new Object();
@@ -17,60 +20,85 @@ public class Buffer {
     private synchronized boolean cheio() {
         return vagasDisponiveis == 0;
     }
-
     private synchronized boolean vazio() {
         return vagasDisponiveis == Main.TOTAL_ASSENTOS;
     }
+    private synchronized void decrementarVaga() {
+        this.vagasDisponiveis--;
+    }
+    private synchronized void incrementarVaga() {
+        this.vagasDisponiveis++;
+    }
+    private synchronized void atualizaCorrendo(boolean correndo) {
+        this.correndo = correndo;
+    }
+    private synchronized void atualizaCarregado(boolean carregado) {
+        this.carregado = carregado;
+    }
+    private synchronized void atualizaDescarregado(boolean descarregado) {
+        this.descarregado = descarregado;
+    }
 
     public void embarcar(int id) {
-        synchronized (travaPassageiros) {
-            if (!cheio()) {
-                vagasDisponiveis--;
-                System.out.println("Passageiro " + id + " embarcou.");
-                try {
+        while (true) {
+            if (!cheio() && this.carregado && !this.correndo) {
+                decrementarVaga();
+                System.out.println(id + " embarcou.");
+
+                if (cheio()) {
                     synchronized (travaCarro) {
-                        if (cheio()) {
-                            travaCarro.notifyAll();
-                        }
+                        if (cheio()) travaCarro.notifyAll();
                     }
-                    travaPassageiros.wait();
-                } catch (InterruptedException e) {}
+
+                    synchronized (travaPassageiros) {
+                        try {
+                            travaPassageiros.wait();
+                        } catch (InterruptedException e) {}
+                    }
+                }
+                break;
             }
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {}
         }
     }
 
     public void desembarcar(int id) {
-        synchronized (travaPassageiros) {
-            vagasDisponiveis++;
-            System.out.println("Passageiro " + id + " embarcou.");
-            synchronized (travaCarro) {
-                if (vazio()) {
-                    travaCarro.notifyAll();
+        if (this.descarregado && !this.correndo) {
+            synchronized (travaPassageiros) {
+                incrementarVaga();
+                System.out.println(id + " desembarcou.");
+                synchronized (travaCarro) {
+                    if (vazio()) {
+                        travaCarro.notifyAll();
+                    }
                 }
             }
         }
     }
 
     public void correr() {
-        System.out.println("Carro está correndo.");
+        System.out.println(Thread.currentThread().getName() + " está correndo");
+        this.atualizaCorrendo(true);
+        this.atualizaDescarregado(false);
+        this.atualizaCarregado(false);
 
-        synchronized (travaPassageiros) {
-            try {
-                travaPassageiros.wait();
-            } catch (InterruptedException e) {}
-        }
-
-        synchronized (travaCarro) {
-            travaCarro.notifyAll();
-        }
+        try {
+            Thread.sleep((int)(Math.random()*2000));
+        } catch (InterruptedException e) {}
     }
 
     public void carregar() {
+        this.atualizaCarregado(true);
+
+        System.out.println("Carro carregou.");
+        synchronized (travaPassageiros) {
+            travaPassageiros.notifyAll();
+        }
+
         synchronized (travaCarro) {
-            System.out.println("Carro carregou.");
-            synchronized (travaPassageiros) {
-                travaPassageiros.notifyAll();
-            }
             try {
                 travaCarro.wait();
             } catch (InterruptedException e) {}
@@ -78,11 +106,15 @@ public class Buffer {
     }
 
     public void descarregar() {
+        this.atualizaDescarregado(true);
+        this.atualizaCorrendo(false);
+        System.out.println("Carro descarregou.");
+
+        synchronized (travaPassageiros) {
+            travaPassageiros.notifyAll();
+        }
+
         synchronized (travaCarro) {
-            System.out.println("Carro descarregou.");
-            synchronized (travaPassageiros) {
-                travaPassageiros.notifyAll();
-            }
             try {
                 travaCarro.wait();
             } catch (InterruptedException e) {}

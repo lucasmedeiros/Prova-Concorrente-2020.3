@@ -9,9 +9,9 @@ public class Carro implements Runnable {
 
     public void run() {
         while(true) {
-            buffer.carregar();
+            this.buffer.carregar();
             this.buffer.correr();
-            buffer.descarregar();
+            this.buffer.descarregar();
         }
     }
 }

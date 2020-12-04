@@ -10,14 +10,7 @@ public class Passageiro implements Runnable {
     }
 
     public void run() {
-        System.out.println("Passageiro " + this.id + " tentando embarcar no carro");
-        buffer.embarcar(this.id);
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {}
-
-        buffer.desembarcar(this.id);
-        System.out.println("Passageiro " + id + " desembarcou.");
+        buffer.embarcar(id);
+        buffer.desembarcar(id);
     }
 }
