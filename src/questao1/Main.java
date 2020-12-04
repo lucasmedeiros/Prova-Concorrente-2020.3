@@ -2,10 +2,9 @@ package questao1;
 
 public class Main {
     public static int TOTAL_PASSAGEIROS = 8;
-    public static int TOTAL_ASSENTOS = 4;
 
     public static void main(String[] args) {
-        Buffer buffer = new Buffer();
+        Buffer buffer = new Buffer(4);
         Passageiro passageiro;
         Thread[] t1 = new Thread[TOTAL_PASSAGEIROS];
         Carro carro = new Carro(buffer);

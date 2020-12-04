@@ -10,6 +10,7 @@ public class Passageiro implements Runnable {
     }
 
     public void run() {
+        buffer.esperaParaEmbarcar();
         buffer.embarcar(id);
         buffer.desembarcar(id);
     }
